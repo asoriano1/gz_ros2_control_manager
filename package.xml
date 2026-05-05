@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>gz_ros2_control_manager</name>
+  <version>0.1.0</version>
+  <description>
+    Gazebo Harmonic GUI plugin: discover ROS 2 controller_manager instances at
+    runtime by scanning ROS 2 services, list their controllers and hardware
+    components, and activate/deactivate already-loaded controllers from the
+    Gazebo GUI without relying on Gazebo ECM, model names, SDF/URDF/XACRO
+    inspection, or any importer-side metadata.
+  </description>
+  <maintainer email="asoriano@robotnik.es">Robotnik</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- ROS 2 -->
+  <depend>rclcpp</depend>
+  <depend>controller_manager_msgs</depend>
+  <depend>rcl_interfaces</depend>
+
+  <!-- Gazebo Harmonic (Jazzy vendor packages) -->
+  <depend>gz_gui_vendor</depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,13 @@
+# Build / install / log directories produced if colcon is invoked
+# from inside the package by mistake.
+build/
+install/
+log/
+
+# Editor / IDE noise
+*.swp
+*.swo
+.vscode/
+.idea/
+__pycache__/
+*.pyc

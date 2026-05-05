@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<!--
+  Self-contained differential-drive demo robot for gz_ros2_control_manager.
+
+  Joints exposed to ros2_control:
+    left_wheel_joint  — velocity command + position/velocity state
+    right_wheel_joint — velocity command + position/velocity state
+
+  Launch with:
+    ros2 launch gz_ros2_control_manager control_manager_demo.launch.py
+-->
+<robot name="diffbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ═══════════════════ Arguments ════════════════════════════════════ -->
+  <!-- namespace: matched to the ros2_control plugin <ros><namespace> tag -->
+  <xacro:arg name="namespace"       default="diffbot"/>
+  <!-- Accepted but unused — lets the launch file pass them unconditionally. -->
+  <xacro:arg name="prefix"          default=""/>
+  <xacro:arg name="gazebo_ignition" default="true"/>
+
+  <!-- ═══════════════════ Geometry constants ═══════════════════════════ -->
+  <xacro:property name="wheel_radius"  value="0.10"/>  <!-- m -->
+  <xacro:property name="wheel_width"   value="0.04"/>  <!-- m -->
+  <xacro:property name="wheel_sep"     value="0.40"/>  <!-- centre-to-centre, m -->
+  <xacro:property name="base_length"   value="0.30"/>  <!-- m -->
+  <xacro:property name="base_width"    value="0.20"/>  <!-- m -->
+  <xacro:property name="base_height"   value="0.10"/>  <!-- m -->
+  <xacro:property name="caster_radius" value="0.04"/>  <!-- m -->
+
+  <!-- base_link origin sits at wheel-axle height; spawn robot at z=wheel_radius. -->
+  <!-- Body visual is offset upward so it sits on top of the axle plane.          -->
+  <xacro:property name="body_z"    value="${base_height / 2.0}"/>
+  <!-- Caster rear position (x negative = towards back of robot).                -->
+  <xacro:property name="caster_x"  value="${-(base_length / 2.0 - caster_radius)}"/>
+  <!-- Caster z in base_link frame so the sphere touches the ground plane.       -->
+  <xacro:property name="caster_z"  value="${-(wheel_radius - caster_radius)}"/>
+
+  <!-- ═══════════════════ base_link ════════════════════════════════════ -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 ${body_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+      <material name="blue"><color rgba="0.2 0.4 0.8 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${body_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <inertia
+        ixx="${2.0/12.0 * (base_width*base_width   + base_height*base_height)}"
+        iyy="${2.0/12.0 * (base_length*base_length + base_height*base_height)}"
+        izz="${2.0/12.0 * (base_length*base_length + base_width*base_width)}"
+        ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <!-- ═══════════════════ Left wheel ═══════════════════════════════════ -->
+  <link name="left_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      <material name="dark_grey"><color rgba="0.15 0.15 0.15 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <!-- cylinder: Ixx=Iyy=m/12*(3r²+h²), Izz=m/2*r² -->
+      <inertia
+        ixx="${0.5/12.0*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+        iyy="${0.5/12.0*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+        izz="${0.5/2.0 * wheel_radius*wheel_radius}"
+        ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel_link"/>
+    <origin xyz="0 ${wheel_sep/2.0} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- ═══════════════════ Right wheel ══════════════════════════════════ -->
+  <link name="right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia
+        ixx="${0.5/12.0*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+        iyy="${0.5/12.0*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+        izz="${0.5/2.0 * wheel_radius*wheel_radius}"
+        ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel_link"/>
+    <origin xyz="0 ${-wheel_sep/2.0} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- ═══════════════════ Caster (passive, frictionless) ═══════════════ -->
+  <link name="caster_link">
+    <visual>
+      <geometry><sphere radius="${caster_radius}"/></geometry>
+      <material name="grey"><color rgba="0.5 0.5 0.5 1.0"/></material>
+    </visual>
+    <collision>
+      <geometry><sphere radius="${caster_radius}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <!-- sphere: I = 2/5 * m * r² -->
+      <inertia
+        ixx="${2.0/5.0 * 0.1 * caster_radius*caster_radius}"
+        iyy="${2.0/5.0 * 0.1 * caster_radius*caster_radius}"
+        izz="${2.0/5.0 * 0.1 * caster_radius*caster_radius}"
+        ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_link"/>
+    <origin xyz="${caster_x} 0 ${caster_z}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Frictionless caster so it can swivel freely on the ground. -->
+  <gazebo reference="caster_link">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
+
+  <!-- ═══════════════════ ros2_control ══════════════════════════════════ -->
+  <ros2_control name="GazeboSimSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+    <joint name="left_wheel_joint">
+      <command_interface name="velocity">
+        <param name="min">-10</param>
+        <param name="max">10</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="right_wheel_joint">
+      <command_interface name="velocity">
+        <param name="min">-10</param>
+        <param name="max">10</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+  <!-- ═══════════════════ Gazebo system plugin ═════════════════════════ -->
+  <gazebo>
+    <plugin filename="libgz_ros2_control-system.so"
+            name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find gz_ros2_control_manager)/config/diffbot_controllers.yaml</parameters>
+      <ros>
+        <namespace>/$(arg namespace)</namespace>
+      </ros>
+    </plugin>
+  </gazebo>
+
+</robot>

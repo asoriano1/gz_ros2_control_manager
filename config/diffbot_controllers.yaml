@@ -1,0 +1,40 @@
+# Controller configuration for the gz_ros2_control_manager diffbot demo.
+#
+# This file is loaded by gz_ros2_control at startup.  Controllers are
+# declared here but NOT loaded or activated automatically — use the
+# gz_ros2_control_manager GUI to load and activate them one at a time.
+#
+# Expected controller_manager path:  /diffbot/controller_manager
+
+/**:
+  controller_manager:
+    ros__parameters:
+      update_rate: 50  # Hz
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      diff_drive_controller:
+        type: diff_drive_controller/DiffDriveController
+
+/**:
+  joint_state_broadcaster:
+    ros__parameters: {}
+
+  diff_drive_controller:
+    ros__parameters:
+      left_wheel_names:  ["left_wheel_joint"]
+      right_wheel_names: ["right_wheel_joint"]
+
+      wheel_separation: 0.40   # metres, centre-to-centre
+      wheel_radius:     0.10   # metres
+
+      cmd_vel_timeout:  0.5    # seconds; stop if no command received
+
+      base_frame_id: base_link
+      odom_frame_id: odom
+
+      publish_rate: 50.0       # Hz; odometry / tf publish rate
+
+      open_loop:       false   # use wheel encoder feedback for odometry
+      enable_odom_tf:  true    # publish odom → base_link transform
