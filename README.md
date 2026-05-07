@@ -17,15 +17,18 @@ This repository provides the **Control Manager** step.
 
 ```mermaid
 flowchart LR
-  A[URDF / XACRO / SDF] --> B[Model Importer<br/>preview + spawn + optional robot_state_publisher]
+  A[URDF / XACRO / SDF] --> B["`**Model Importer**
+(preview · spawn · robot_state_publisher)`"]
   B --> C[Gazebo world]
-  C --> D[Bridge Manager<br/>discover sensors/topics + run ros_gz_bridge]
-  C --> E[Control Manager<br/>discover controller_managers + load/activate controllers]
-  D --> F[ROS 2 applications<br/>RViz / Nav2 / MoveIt / custom nodes]
+  C --> D["`**Bridge Manager**
+(sensor topics · ros_gz_bridge)`"]
+  C --> E["`**Control Manager**
+(load · configure · activate controllers)`"]
+  D --> F[ROS 2 applications<br/>RViz · Nav2 · MoveIt · custom nodes]
   E --> F
 
-  classDef suite fill:#0057a8,stroke:#004494,color:#ffffff
-  classDef external fill:#f0f0f0,stroke:#999999,color:#555555,stroke-dasharray:5 5
+  classDef suite fill:#dbeafe,stroke:#93c5fd,color:#1e3a5f
+  classDef external fill:#f3f4f6,stroke:#d1d5db,color:#6b7280,stroke-dasharray:5 5
 
   class B,D,E suite
   class A,C,F external
