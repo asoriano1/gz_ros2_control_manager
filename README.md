@@ -64,6 +64,8 @@ Sourcing `install/setup.bash` automatically sets:
 
 ## Demo
 
+![Control manager demo](demo_control.gif)
+
 Run the bundled differential-drive demo:
 
 ```bash
