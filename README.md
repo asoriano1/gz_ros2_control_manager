@@ -4,14 +4,14 @@ Gazebo Harmonic GUI plugin for ROS 2 Jazzy that discovers `ros2_control` control
 
 ## Gazebo ROS 2 Model Runtime Suite
 
-This package is part of the **Gazebo ROS 2 Model Runtime Suite**:
+This package is part of the **Gazebo ROS 2 Model Runtime Suite** where each module has its own independency:
 
 - **[ROS2 Control Manager](https://github.com/asoriano1/gz_ros2_control_manager)** (`gz_ros2_control_manager`)
   Discovers `controller_manager` instances, hardware interfaces, and controllers, and provides a UI to load, configure, and activate existing controllers.
 - [Model Importer](https://github.com/asoriano1/gz_model_importer_plugin) (`gz_model_importer_plugin`) — imports URDF / XACRO / SDF models with preview, spawn, and optional `robot_state_publisher`.
 - [GZ Bridge Manager](https://github.com/asoriano1/gz_ros2_bridge_manager) (`gz_ros2_bridge_manager`) — discovers active sensor topics and launches ROS 2 bridges.
 
-This repository provides the **ROS2 Control Manager** step.
+This repository provides the **ROS2 Control Manager** module.
 
 ```mermaid
 flowchart LR
