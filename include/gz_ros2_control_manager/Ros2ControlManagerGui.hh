@@ -26,7 +26,7 @@ namespace gz_ros2_control_manager
 /// list_controllers + (optionally) list_hardware_interfaces +
 /// list_hardware_components and lets the user activate/deactivate
 /// already-loaded controllers via STRICT switch_controller calls.
-class ControlManagerPlugin : public gz::gui::Plugin
+class Ros2ControlManagerGui : public gz::gui::Plugin
 {
   Q_OBJECT
 
@@ -40,8 +40,8 @@ class ControlManagerPlugin : public gz::gui::Plugin
              NOTIFY controllerManagersChanged)
 
 public:
-  ControlManagerPlugin();
-  ~ControlManagerPlugin() override;
+  Ros2ControlManagerGui();
+  ~Ros2ControlManagerGui() override;
 
   void LoadConfig(const tinyxml2::XMLElement *_pluginElem) override;
 
@@ -81,6 +81,8 @@ private slots:
   void onAutoRefreshTick();
 
 private:
+  /// One refresh worth of data gathered for a single controller_manager.
+  /// Built off the main thread; published to QML as one card.
   struct ManagerSnapshot
   {
     DiscoveredManager                  manager;

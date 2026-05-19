@@ -26,6 +26,7 @@ struct ControllerInfo
   std::vector<std::string> claimedInterfaces;
 };
 
+/// One row of the controller_manager's hardware interface table.
 struct HardwareInterfaceInfo
 {
   std::string name;
@@ -33,6 +34,7 @@ struct HardwareInterfaceInfo
   bool isClaimed{false};
 };
 
+/// One row of the controller_manager's hardware component table.
 struct HardwareComponentInfo
 {
   std::string name;
@@ -50,6 +52,7 @@ struct ConfiguredController
   std::string type;
 };
 
+/// Result of ControllerManagerClient::listControllers().
 struct ListControllersResult
 {
   bool serviceAvailable{false};
@@ -58,6 +61,7 @@ struct ListControllersResult
   std::vector<ControllerInfo> controllers;
 };
 
+/// Result of ControllerManagerClient::listHardwareInterfaces().
 struct ListHardwareInterfacesResult
 {
   bool serviceAvailable{false};
@@ -66,6 +70,7 @@ struct ListHardwareInterfacesResult
   std::vector<HardwareInterfaceInfo> stateInterfaces;
 };
 
+/// Result of ControllerManagerClient::listHardwareComponents().
 struct ListHardwareComponentsResult
 {
   bool serviceAvailable{false};
@@ -73,6 +78,7 @@ struct ListHardwareComponentsResult
   std::vector<HardwareComponentInfo> components;
 };
 
+/// Result of ControllerManagerClient::listConfiguredControllers().
 struct ListConfiguredControllersResult
 {
   bool serviceAvailable{false};
@@ -81,6 +87,8 @@ struct ListConfiguredControllersResult
   std::vector<ConfiguredController> controllers;
 };
 
+/// Result of ControllerManagerClient::activateController() /
+/// deactivateController().
 struct SwitchControllerResult
 {
   bool serviceAvailable{false};
@@ -93,6 +101,7 @@ struct SwitchControllerResult
   bool clientTimedOut{false};
 };
 
+/// Result of ControllerManagerClient::loadController().
 struct LoadControllerResult
 {
   bool serviceAvailable{false};
@@ -102,6 +111,7 @@ struct LoadControllerResult
   std::string errorMessage;
 };
 
+/// Result of ControllerManagerClient::configureController().
 struct ConfigureControllerResult
 {
   bool serviceAvailable{false};

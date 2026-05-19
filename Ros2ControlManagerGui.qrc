@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/Ros2ControlManagerGui">
+    <file alias="Ros2ControlManagerGui.qml">gui/Ros2ControlManagerGui.qml</file>
+  </qresource>
+</RCC>

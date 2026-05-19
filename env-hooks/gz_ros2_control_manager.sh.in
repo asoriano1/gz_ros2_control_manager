@@ -1,5 +1,5 @@
 # Prepend install/lib to GZ_GUI_PLUGIN_PATH so gz sim discovers
-# libControlManagerPlugin.so at runtime.
+# libRos2ControlManagerGui.so at runtime.
 _rcm_prefix="${COLCON_CURRENT_PREFIX:-${AMENT_CURRENT_PREFIX:-}}"
 if [ -n "$_rcm_prefix" ]; then
   case ":${GZ_GUI_PLUGIN_PATH:-}:" in

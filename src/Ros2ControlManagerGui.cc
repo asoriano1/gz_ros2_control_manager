@@ -1,4 +1,4 @@
-#include "gz_ros2_control_manager/ControlManagerPlugin.hh"
+#include "gz_ros2_control_manager/Ros2ControlManagerGui.hh"
 
 #include <QDateTime>
 #include <QVariantMap>
@@ -13,7 +13,7 @@
 // Q_INIT_RESOURCE must live outside any namespace.
 static void initControlManagerResources()
 {
-  Q_INIT_RESOURCE(ControlManagerPlugin);
+  Q_INIT_RESOURCE(Ros2ControlManagerGui);
 }
 
 namespace gz_ros2_control_manager
@@ -118,7 +118,7 @@ QVariantList hwComponentsToVariantList(
 // Construction / lifecycle
 // ============================================================================
 
-ControlManagerPlugin::ControlManagerPlugin()
+Ros2ControlManagerGui::Ros2ControlManagerGui()
 : gz::gui::Plugin()
 {
   initControlManagerResources();
@@ -134,13 +134,13 @@ ControlManagerPlugin::ControlManagerPlugin()
 
   autoRefreshTimer_.setInterval(kAutoRefreshIntervalMs);
   connect(&autoRefreshTimer_, &QTimer::timeout,
-          this, &ControlManagerPlugin::onAutoRefreshTick);
+          this, &Ros2ControlManagerGui::onAutoRefreshTick);
 
   gzdbg << "[gz_ros2_control_manager] plugin constructed; ROS 2 node="
         << discovery_->node()->get_fully_qualified_name() << '\n';
 }
 
-ControlManagerPlugin::~ControlManagerPlugin()
+Ros2ControlManagerGui::~Ros2ControlManagerGui()
 {
   gzdbg << "[gz_ros2_control_manager] plugin destruction starting\n";
 
@@ -168,7 +168,7 @@ ControlManagerPlugin::~ControlManagerPlugin()
   gzdbg << "[gz_ros2_control_manager] plugin destruction complete\n";
 }
 
-void ControlManagerPlugin::LoadConfig(const tinyxml2::XMLElement * /*_elem*/)
+void Ros2ControlManagerGui::LoadConfig(const tinyxml2::XMLElement * /*_elem*/)
 {
   if (this->title.empty())
     this->title = "ROS 2 Control Manager";
@@ -178,21 +178,21 @@ void ControlManagerPlugin::LoadConfig(const tinyxml2::XMLElement * /*_elem*/)
 // Property setters / signals
 // ============================================================================
 
-void ControlManagerPlugin::setStatus(const QString &text)
+void Ros2ControlManagerGui::setStatus(const QString &text)
 {
   if (statusText_ == text) return;
   statusText_ = text;
   emit statusTextChanged();
 }
 
-void ControlManagerPlugin::setBusy(bool value)
+void Ros2ControlManagerGui::setBusy(bool value)
 {
   if (busy_ == value) return;
   busy_ = value;
   emit busyChanged();
 }
 
-void ControlManagerPlugin::setAutoRefresh(bool enabled)
+void Ros2ControlManagerGui::setAutoRefresh(bool enabled)
 {
   if (autoRefresh_ == enabled) return;
   autoRefresh_ = enabled;
@@ -203,14 +203,14 @@ void ControlManagerPlugin::setAutoRefresh(bool enabled)
   emit autoRefreshChanged();
 }
 
-void ControlManagerPlugin::setDebugMode(bool enabled)
+void Ros2ControlManagerGui::setDebugMode(bool enabled)
 {
   if (debugMode_ == enabled) return;
   debugMode_ = enabled;
   emit debugModeChanged();
 }
 
-void ControlManagerPlugin::onAutoRefreshTick()
+void Ros2ControlManagerGui::onAutoRefreshTick()
 {
   if (operationInFlight_.load() || shuttingDown_.load())
     return;
@@ -221,7 +221,7 @@ void ControlManagerPlugin::onAutoRefreshTick()
 // Operation guard — single-slot serialization for refresh & switch
 // ============================================================================
 
-bool ControlManagerPlugin::tryBeginOperation(const QString &description)
+bool Ros2ControlManagerGui::tryBeginOperation(const QString &description)
 {
   if (shuttingDown_.load())
     return false;
@@ -235,7 +235,7 @@ bool ControlManagerPlugin::tryBeginOperation(const QString &description)
   return true;
 }
 
-void ControlManagerPlugin::endOperation()
+void Ros2ControlManagerGui::endOperation()
 {
   operationInFlight_.store(false);
   setBusy(false);
@@ -245,16 +245,16 @@ void ControlManagerPlugin::endOperation()
 // Refresh — discovery + per-manager queries on a worker thread
 // ============================================================================
 
-void ControlManagerPlugin::refresh()
+void Ros2ControlManagerGui::refresh()
 {
   if (!tryBeginOperation(QStringLiteral("Scanning ROS 2 services…")))
     return;
   runRefreshAsync();
 }
 
-void ControlManagerPlugin::runRefreshAsync()
+void Ros2ControlManagerGui::runRefreshAsync()
 {
-  ControlManagerPlugin *self = this;
+  Ros2ControlManagerGui *self = this;
   auto discovery = discovery_;
   auto client    = client_;
 
@@ -301,7 +301,7 @@ void ControlManagerPlugin::runRefreshAsync()
   futures_.addFuture(future);
 }
 
-void ControlManagerPlugin::publishSnapshots(
+void Ros2ControlManagerGui::publishSnapshots(
     const std::vector<ManagerSnapshot> &snaps)
 {
   managerCards_.clear();
@@ -433,19 +433,19 @@ void ControlManagerPlugin::publishSnapshots(
 // Activate / deactivate
 // ============================================================================
 
-void ControlManagerPlugin::activateController(
+void Ros2ControlManagerGui::activateController(
     const QString &managerPath, const QString &controllerName)
 {
   runSwitchAsync(managerPath, controllerName, /*activate=*/true);
 }
 
-void ControlManagerPlugin::deactivateController(
+void Ros2ControlManagerGui::deactivateController(
     const QString &managerPath, const QString &controllerName)
 {
   runSwitchAsync(managerPath, controllerName, /*activate=*/false);
 }
 
-void ControlManagerPlugin::runSwitchAsync(
+void Ros2ControlManagerGui::runSwitchAsync(
     QString managerPath, QString controllerName, bool activate)
 {
   const QString verb = activate ? QStringLiteral("Activating")
@@ -453,7 +453,7 @@ void ControlManagerPlugin::runSwitchAsync(
   if (!tryBeginOperation(QString("%1 '%2'…").arg(verb, controllerName)))
     return;
 
-  ControlManagerPlugin *self = this;
+  Ros2ControlManagerGui *self = this;
   auto client = client_;
   const std::string mgr  = managerPath.toStdString();
   const std::string ctrl = controllerName.toStdString();
@@ -536,7 +536,7 @@ void ControlManagerPlugin::runSwitchAsync(
 // Configure (already-loaded, unconfigured controller)
 // ============================================================================
 
-void ControlManagerPlugin::configureController(
+void Ros2ControlManagerGui::configureController(
     const QString &managerPath, const QString &controllerName)
 {
   if (controllerName.trimmed().isEmpty())
@@ -547,14 +547,14 @@ void ControlManagerPlugin::configureController(
   runConfigureAsync(managerPath, controllerName);
 }
 
-void ControlManagerPlugin::runConfigureAsync(
+void Ros2ControlManagerGui::runConfigureAsync(
     QString managerPath, QString controllerName)
 {
   if (!tryBeginOperation(
           QString("Configuring '%1'…").arg(controllerName)))
     return;
 
-  ControlManagerPlugin *self = this;
+  Ros2ControlManagerGui *self = this;
   auto client = client_;
   const std::string mgr  = managerPath.toStdString();
   const std::string ctrl = controllerName.toStdString();
@@ -615,7 +615,7 @@ void ControlManagerPlugin::runConfigureAsync(
 // Load inactive (configured-but-not-loaded: load_controller → configure_controller)
 // ============================================================================
 
-void ControlManagerPlugin::loadControllerInactive(
+void Ros2ControlManagerGui::loadControllerInactive(
     const QString &managerPath, const QString &controllerName)
 {
   if (controllerName.trimmed().isEmpty())
@@ -626,14 +626,14 @@ void ControlManagerPlugin::loadControllerInactive(
   runLoadInactiveAsync(managerPath, controllerName);
 }
 
-void ControlManagerPlugin::runLoadInactiveAsync(
+void Ros2ControlManagerGui::runLoadInactiveAsync(
     QString managerPath, QString controllerName)
 {
   if (!tryBeginOperation(
           QString("Loading '%1'…").arg(controllerName)))
     return;
 
-  ControlManagerPlugin *self = this;
+  Ros2ControlManagerGui *self = this;
   auto client = client_;
   const std::string mgr  = managerPath.toStdString();
   const std::string ctrl = controllerName.toStdString();
@@ -755,5 +755,5 @@ void ControlManagerPlugin::runLoadInactiveAsync(
 
 }  // namespace gz_ros2_control_manager
 
-GZ_ADD_PLUGIN(gz_ros2_control_manager::ControlManagerPlugin,
+GZ_ADD_PLUGIN(gz_ros2_control_manager::Ros2ControlManagerGui,
               gz::gui::Plugin)

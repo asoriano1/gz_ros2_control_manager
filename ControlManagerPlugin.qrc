@@ -1,5 +1,0 @@
-<RCC>
-  <qresource prefix="/ControlManagerPlugin">
-    <file alias="ControlManagerPlugin.qml">gui/ControlManagerPanel.qml</file>
-  </qresource>
-</RCC>

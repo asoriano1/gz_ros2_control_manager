@@ -2,7 +2,7 @@ import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
-// Context property: controlManager → ControlManagerPlugin (C++)
+// Context property: controlManager → Ros2ControlManagerGui (C++)
 Rectangle {
   id: root
   color: "transparent"

@@ -30,22 +30,22 @@ find_package(Qt5 REQUIRED COMPONENTS Core Concurrent Gui Quick QuickControls2)
 
 # ===================================================================
 # Plugin target
-# Class:   ControlManagerPlugin  →  libControlManagerPlugin.so
-# QML res: :/ControlManagerPlugin/ControlManagerPanel.qml
+# Class:   Ros2ControlManagerGui  →  libRos2ControlManagerGui.so
+# QML res: :/Ros2ControlManagerGui/Ros2ControlManagerGui.qml
 # ===================================================================
-set(PLUGIN_NAME ControlManagerPlugin)
+set(PLUGIN_NAME Ros2ControlManagerGui)
 
 set(PLUGIN_SOURCES
-  src/ControlManagerPlugin.cc
+  src/Ros2ControlManagerGui.cc
   src/Ros2ControlDiscovery.cc
   src/ControllerManagerClient.cc
 )
 
 set(PLUGIN_MOC_HEADERS
-  include/gz_ros2_control_manager/ControlManagerPlugin.hh
+  include/gz_ros2_control_manager/Ros2ControlManagerGui.hh
 )
 
-qt5_add_resources(PLUGIN_RCC ControlManagerPlugin.qrc)
+qt5_add_resources(PLUGIN_RCC Ros2ControlManagerGui.qrc)
 
 add_library(${PLUGIN_NAME} SHARED
   ${PLUGIN_SOURCES}
